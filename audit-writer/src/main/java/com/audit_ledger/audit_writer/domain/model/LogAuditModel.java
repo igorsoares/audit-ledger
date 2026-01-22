@@ -17,6 +17,7 @@ public class LogAuditModel {
     @Column(name = "user_id")
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false)
     private EventType eventType;
 

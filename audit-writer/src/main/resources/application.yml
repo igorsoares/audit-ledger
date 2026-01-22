@@ -12,7 +12,7 @@ spring:
     show-sql: true
 
 ecdsa:
-  private-key-file-location: ${PRIVATE_KEY_PATH:NULL}
+  private-key-file-location: ${PRIVATE_KEY_PATH:}
 
 kafka:
   bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}

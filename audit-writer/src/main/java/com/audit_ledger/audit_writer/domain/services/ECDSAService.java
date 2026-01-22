@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -26,7 +26,7 @@ public class ECDSAService implements SignMessage {
 
     private PrivateKey loadKeyPair() {
         try{
-            if(this.privateKeyPath != null){
+            if(!ObjectUtils.isEmpty(privateKeyPath)){
                 return loadPrivateKey();
             }
             return generatePrivateKey();
@@ -38,11 +38,27 @@ public class ECDSAService implements SignMessage {
 
     private PrivateKey generatePrivateKey(){
         try{
+            log.info("No file found for private key. Generating a key pair...");
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
             keyGen.initialize(256);
 
             KeyPair keyPair = keyGen.generateKeyPair();
-            return keyPair.getPrivate();
+            PrivateKey privateKey = keyPair.getPrivate();
+            String privateAsBase64 = Base64.getEncoder().encodeToString(privateKey.getEncoded());
+            String publicAsBase64 = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+            log.info("""
+            The keypair was successfully generated :
+            \n
+            -----BEGIN PRIVATE KEY-----
+            {}
+            -----END PRIVATE KEY-----
+            
+             -----BEGIN PUBLIC KEY-----
+            {}
+            -----END PUBLIC KEY-----
+            \n
+            """, privateAsBase64, publicAsBase64 );
+            return privateKey;
         }catch (Exception e){
             throw new KeyPairLoadException(e.getMessage());
         }
@@ -56,9 +72,7 @@ public class ECDSAService implements SignMessage {
         StringBuilder privateKeyStrBuilder = new StringBuilder();
         try(Scanner reader = new Scanner(privateFile)){
             while(reader.hasNextLine()){
-                var line = reader.nextLine();
-                System.out.println(line);
-                privateKeyStrBuilder.append(line).append("\n");
+                privateKeyStrBuilder.append(reader.nextLine()).append("\n");
             }
 
             String formattedPrivateKey = privateKeyStrBuilder.toString()
@@ -73,7 +87,7 @@ public class ECDSAService implements SignMessage {
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
 
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            System.out.println("Private key has been loaded");
+            log.info("Private key has been loaded");
             return privateKey;
         } catch (Exception e){
             throw new KeyPairLoadException(e.getMessage());

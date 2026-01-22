@@ -1,6 +1,7 @@
 package com.audit_ledger.audit_writer.domain.services;
 
 import com.audit_ledger.audit_writer.application.dtos.RecvEvent;
+import com.audit_ledger.audit_writer.application.exceptions.AuditException;
 import com.audit_ledger.audit_writer.application.interfaces.Audit;
 import com.audit_ledger.audit_writer.application.interfaces.Hash;
 import com.audit_ledger.audit_writer.application.interfaces.SignMessage;
@@ -35,7 +36,7 @@ public class AuditWriterService implements Audit {
 
     @Override
     public void audit(RecvEvent event) throws JsonProcessingException {
-        try{
+        try {
             log.info("Starting new audit event");
             String recvEventAsString = new ObjectMapper().findAndRegisterModules().writeValueAsString(event);
             LocalDateTime now = LocalDateTime.now();
@@ -43,25 +44,22 @@ public class AuditWriterService implements Audit {
             LogAuditModel newAudit = new LogAuditModel(
                     event.getUserId(), event.getEvent(), event.getIpAddress(),
                     recvEventAsString, getPreviousHash(),
-                    SIGNATURE_ALGO, now );
+                    SIGNATURE_ALGO, now);
 
             newAudit.setCurrentHash(hashService.execute(newAudit.toString()));
             newAudit.setSignature(signMessage.sign(newAudit.getCurrentHash()));
 
             auditWriterRepository.save(newAudit);
             log.info("The current log event has been successfully created");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (SignatureException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            log.error("Couldn't audit correctly due to : {}", e.getMessage());
+            throw new AuditException(e.getMessage());
         }
     }
 
-    private String getPreviousHash(){
+    private String getPreviousHash() {
         Optional<LogAuditModel> lastAuditLog = auditWriterRepository.findLastLog();
-        if(lastAuditLog.isEmpty())
+        if (lastAuditLog.isEmpty())
             return GENESIS_HASH;
 
         return lastAuditLog.get().getCurrentHash();
