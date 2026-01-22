@@ -1,6 +1,5 @@
 package com.audit_ledger.audit_writer.domain.services;
 
-import com.audit_ledger.audit_writer.application.common.AuditCommon;
 import com.audit_ledger.audit_writer.application.exceptions.KeyPairLoadException;
 import com.audit_ledger.audit_writer.application.exceptions.PrivateKeyFileNotFoundException;
 import com.audit_ledger.audit_writer.application.interfaces.SignMessage;
@@ -19,6 +18,7 @@ import java.util.Scanner;
 
 @Component
 public class ECDSAService implements SignMessage {
+    private PrivateKey privateKey;
     @Value("${ecdsa.private-key-file-location}")
     private String privateKeyPath;
 
@@ -96,12 +96,14 @@ public class ECDSAService implements SignMessage {
 
     @Override
     public String sign(String message) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-        PrivateKey privateKey = loadKeyPair();
+        if(this.privateKey == null){
+            this.privateKey = loadKeyPair();
+        }
         Signature signature = Signature.getInstance("SHA256withECDSA");
         signature.initSign(privateKey);
 
         signature.update(message.getBytes(StandardCharsets.UTF_8));
 
-        return AuditCommon.bytesToHex(signature.sign());
+        return Base64.getEncoder().encodeToString(signature.sign());
     }
 }
