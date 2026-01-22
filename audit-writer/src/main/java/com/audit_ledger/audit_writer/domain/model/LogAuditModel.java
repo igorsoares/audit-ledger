@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 public class LogAuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long cdId;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "event_type", nullable = false)
     private EventType eventType;
@@ -37,6 +41,43 @@ public class LogAuditModel {
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public LogAuditModel(Long userId, EventType eventType, String ipAddress, String payload, String previousHash, String signatureAlgo, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.eventType = eventType;
+        this.ipAddress = ipAddress;
+        this.payload = payload;
+        this.previousHash = previousHash;
+        this.signatureAlgo = signatureAlgo;
+        this.createdAt = createdAt;
+    }
+
+    public LogAuditModel() {
+    }
+
+    /**
+     * This toString() method is used to generate a
+     * SHA256 HASH
+     */
+    @Override
+    public String toString() {
+        return "LogAuditModel{" +
+                "eventType=" + eventType +
+                ", ipAddress='" + ipAddress + '\'' +
+                ", payload='" + payload + '\'' +
+                ", previousHash='" + previousHash + '\'' +
+                ", signatureAlgo='" + signatureAlgo + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public Long getCdId() {
         return cdId;

@@ -11,6 +11,9 @@ spring:
       ddl-auto: none
     show-sql: true
 
+ecdsa:
+  private-key-file-location: ${PRIVATE_KEY_PATH:NULL}
+
 kafka:
   bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
   topics:
