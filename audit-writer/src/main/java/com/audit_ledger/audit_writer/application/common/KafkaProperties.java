@@ -1,4 +1,4 @@
-package com.audit_ledger.audit_writer.config;
+package com.audit_ledger.audit_writer.application.common;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

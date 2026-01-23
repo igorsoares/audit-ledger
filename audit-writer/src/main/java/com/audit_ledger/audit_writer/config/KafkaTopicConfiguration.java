@@ -1,5 +1,6 @@
 package com.audit_ledger.audit_writer.config;
 
+import com.audit_ledger.audit_writer.application.common.KafkaProperties;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;

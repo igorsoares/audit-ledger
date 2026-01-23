@@ -1,33 +1,34 @@
 package com.audit_ledger.audit_writer.domain.services;
 
+import com.audit_ledger.audit_writer.application.common.ECDSAProperties;
 import com.audit_ledger.audit_writer.application.exceptions.KeyPairLoadException;
-import com.audit_ledger.audit_writer.application.exceptions.PrivateKeyFileNotFoundException;
+import com.audit_ledger.audit_writer.application.interfaces.LoadPrivateKeyFile;
 import com.audit_ledger.audit_writer.application.interfaces.SignMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
-import java.util.Scanner;
 
 @Component
 public class ECDSAService implements SignMessage {
-    private PrivateKey privateKey;
-    @Value("${ecdsa.private-key-file-location}")
-    private String privateKeyPath;
-
+    private final LoadPrivateKeyFile loadPrivateKey;
+    private final ECDSAProperties ecdsaProperties;
     private static final Logger log = LoggerFactory.getLogger(ECDSAService.class);
+    private PrivateKey privateKey;
+
+    public ECDSAService(LoadPrivateKeyFile loadPrivateKey, ECDSAProperties ecdsaProperties) {
+        this.loadPrivateKey = loadPrivateKey;
+        this.ecdsaProperties = ecdsaProperties;
+    }
 
     private PrivateKey loadKeyPair() {
         try{
-            if(!ObjectUtils.isEmpty(privateKeyPath)){
-                return loadPrivateKey();
+            if(!ObjectUtils.isEmpty(ecdsaProperties.getPrivateKeyFileLocation())){
+                return loadPrivateKey.load();
             }
             return generatePrivateKey();
         }catch (Exception e){
@@ -64,35 +65,6 @@ public class ECDSAService implements SignMessage {
         }
     }
 
-    private PrivateKey loadPrivateKey() {
-        File privateFile = new File(this.privateKeyPath);
-        if(!privateFile.exists()){
-            throw new PrivateKeyFileNotFoundException(this.privateKeyPath);
-        }
-        StringBuilder privateKeyStrBuilder = new StringBuilder();
-        try(Scanner reader = new Scanner(privateFile)){
-            while(reader.hasNextLine()){
-                privateKeyStrBuilder.append(reader.nextLine()).append("\n");
-            }
-
-            String formattedPrivateKey = privateKeyStrBuilder.toString()
-                    .replace("-----BEGIN PRIVATE KEY-----","")
-                    .replace("-----END PRIVATE KEY-----","")
-                    .replace(" ","")
-                    .replace("\n","");
-
-            byte[] keyBytes = Base64.getDecoder().decode(formattedPrivateKey);
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-
-            KeyFactory keyFactory = KeyFactory.getInstance("EC");
-
-            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            log.info("Private key has been loaded");
-            return privateKey;
-        } catch (Exception e){
-            throw new KeyPairLoadException(e.getMessage());
-        }
-    }
 
     @Override
     public String sign(String message) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
