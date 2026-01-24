@@ -1,10 +1,9 @@
 # audit-ledger
 
 <div align="center">
-  <img width="500" height="500" alt="lucid-origin_a_minimalist_sherlock_holmes_with_a_magnifying_glass_but_his_face_is_covered_wit-0-removebg-preview" src="https://github.com/user-attachments/assets/9e7ab555-daad-49b0-9755-6a0cba4e6dfb" />
+  <img width="400" height="400" alt="gemini-2 5-flash-image_Instead_of_black_paint_in_green-0" src="https://github.com/user-attachments/assets/adce1a0d-8cd5-40c1-aef1-47291b6032fa" />
   <p><strong>Don't Trust. Verify !</strong></p>
 </div>
-
 
 
 
