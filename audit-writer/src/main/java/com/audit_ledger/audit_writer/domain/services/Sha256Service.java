@@ -19,7 +19,4 @@ public class Sha256Service implements Hash {
         MessageDigest digest = MessageDigest.getInstance("SHA256");
         return AuditCommon.bytesToHex(digest.digest(payload.getBytes(StandardCharsets.UTF_8)));
     }
-
-
-
 }

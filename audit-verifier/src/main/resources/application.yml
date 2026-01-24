@@ -10,3 +10,6 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+
+ecdsa:
+  public-key-file-location: ${PUBLIC_KEY_PATH:}
