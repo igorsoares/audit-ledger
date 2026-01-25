@@ -7,8 +7,6 @@
 
 
 
-
-
 <div align="center">
 
   [Installation](#installation) ·
@@ -28,15 +26,49 @@ This project uses the following stack:
 
 - Java 21
 - Maven
+- Docker && Docker-compose
 - Spring Boot framework
 - Apache Kafka
 - PostgreSQL
 - Flyway
 
 ## Installation
-....
 
+1- Clone this repository
 
+```bash
+git clone git@github.com:igorsoares/audit-ledger.git
+```
+
+2- Docker compose run
+
+```bash
+cd audit-ledger && docker-compose up -d
+```
+
+### Configuration
+
+To run this project correctly, you will need an ECDSA key pair.
+
+On Unix-based systems, you can generate it using the following commands:
+
+1- Generate a private key
+
+```bash
+openssl ecparam -name prime256v1 -genkey -noout -out ecdsa_01.pem
+```
+
+This file will be used in the audit-verifier project to verify log signatures.
+
+**Please ensure that the private key file (ecdsa_01.pem) is stored securely.**
+
+2- Generate a public key
+
+```bash
+openssl ec -in ecdsa_01.pem -pubout -out ec_public.pem
+```
+
+This file will be used in the `audit-verifier` project to verify the signature of logs.
 
 ## Design
 
@@ -72,3 +104,4 @@ The audit writer is going to valid all input events and do all the math problems
 
 ### Audit verifier
 The second one, `audit-verifier` is responsible for verifying all the log chain
+
