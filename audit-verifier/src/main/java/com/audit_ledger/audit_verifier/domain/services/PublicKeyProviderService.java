@@ -3,23 +3,18 @@ package com.audit_ledger.audit_verifier.domain.services;
 import com.audit_ledger.audit_verifier.application.configuration.ECDSAProperties;
 import com.audit_ledger.audit_verifier.application.exceptions.PublicKeyLoadException;
 import com.audit_ledger.audit_verifier.application.interfaces.PublicKeyProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Scanner;
 
 @Service
 public class PublicKeyProviderService implements PublicKeyProvider {
