@@ -43,14 +43,13 @@ public class LogAuditModel {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public LogAuditModel(Long userId, EventType eventType, String ipAddress, String payload, String previousHash, String signatureAlgo, LocalDateTime createdAt) {
+    public LogAuditModel(Long userId, EventType eventType, String ipAddress, String payload, String previousHash, String signatureAlgo) {
         this.userId = userId;
         this.eventType = eventType;
         this.ipAddress = ipAddress;
         this.payload = payload;
         this.previousHash = previousHash;
         this.signatureAlgo = signatureAlgo;
-        this.createdAt = createdAt;
     }
 
     public LogAuditModel() {
@@ -68,7 +67,6 @@ public class LogAuditModel {
                 ", payload='" + payload + '\'' +
                 ", previousHash='" + previousHash + '\'' +
                 ", signatureAlgo='" + signatureAlgo + '\'' +
-                ", createdAt=" + createdAt +
                 '}';
     }
 

@@ -44,7 +44,7 @@ public class AuditWriterService implements Audit {
             LogAuditModel newAudit = new LogAuditModel(
                     event.getUserId(), event.getEvent(), event.getIpAddress(),
                     recvEventAsString, getPreviousHash(),
-                    SIGNATURE_ALGO, now);
+                    SIGNATURE_ALGO);
 
             newAudit.setCurrentHash(hashService.execute(newAudit.toString()));
             newAudit.setSignature(signMessage.sign(newAudit.getCurrentHash()));
