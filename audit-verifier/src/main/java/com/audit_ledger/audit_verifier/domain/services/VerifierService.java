@@ -37,13 +37,12 @@ public class VerifierService implements ApplicationRunner {
     @Scheduled(cron = "* */10 * * * *")
     public void verify(){
         PublicKey publicKey = publicKeyProvider.getPublicKey();
-        logger.info("Retrieving all logs");
         List<LogAuditModel> allLogs = auditRepository.findAll();
         allLogs = allLogs.stream().sorted(Comparator.comparing(LogAuditModel::getCreatedAt).reversed()).toList();
 
         for(LogAuditModel log : allLogs){
             if(!isHashTrustable(log)){
-                logger.warn("The hash of log audit ID {} has been modified. Sending warning notification",log.getCdId());
+                logger.warn("The hash of log audit ID {} has been modified.",log.getCdId());
                 panicButton.execute();
                 return;
             }
