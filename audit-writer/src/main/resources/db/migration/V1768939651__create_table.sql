@@ -1,5 +1,6 @@
 CREATE TABLE audit_log(
     id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT,
     event_type TEXT NOT NULL,
     ip_address TEXT NOT NULL,
     payload TEXT NOT NULL,

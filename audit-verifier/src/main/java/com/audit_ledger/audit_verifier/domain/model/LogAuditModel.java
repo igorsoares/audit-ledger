@@ -1,6 +1,5 @@
-package com.audit_ledger.audit_writer.domain.model;
+package com.audit_ledger.audit_verifier.domain.model;
 
-import com.audit_ledger.audit_writer.application.enums.EventType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,9 +16,8 @@ public class LogAuditModel {
     @Column(name = "user_id")
     private Long userId;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false)
-    private EventType eventType;
+    private String eventType;
 
     @Column(name = "ip_address", nullable = false)
     private String ipAddress;
@@ -43,13 +41,14 @@ public class LogAuditModel {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public LogAuditModel(Long userId, EventType eventType, String ipAddress, String payload, String previousHash, String signatureAlgo) {
+    public LogAuditModel(Long userId, String eventType, String ipAddress, String payload, String previousHash, String signatureAlgo, LocalDateTime createdAt) {
         this.userId = userId;
         this.eventType = eventType;
         this.ipAddress = ipAddress;
         this.payload = payload;
         this.previousHash = previousHash;
         this.signatureAlgo = signatureAlgo;
+        this.createdAt = createdAt;
     }
 
     public LogAuditModel() {
@@ -86,11 +85,11 @@ public class LogAuditModel {
         this.cdId = cdId;
     }
 
-    public EventType getEventType() {
+    public String getEventType() {
         return eventType;
     }
 
-    public void setEventType(EventType eventType) {
+    public void setEventType(String eventType) {
         this.eventType = eventType;
     }
 
