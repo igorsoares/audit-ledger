@@ -72,14 +72,48 @@ This file will be used in the `audit-verifier` project to verify the signature o
 
 ## Design
 
-<img width="1842" height="1071" alt="image" src="https://github.com/user-attachments/assets/01424433-480b-442e-98d3-b02debb4caba" />
+
+```mermaid
+flowchart LR
+    User["User / External app"] -- changes password --> Topic["KAFKA log_event_topic"]
+    Writer["audit-writer"] -- "SHA-256 + ECDSA" --> DB[("Postgres<br>Append-only log")]
+    Verifier["audit-verifier"] -- Scheduled Job --> DB
+    Writer -- Consumes topic --> Topic
+    Verifier -- Validate hash chain<br>and signature --> n1["Is there either a hash inconsistency or a signing key issue?"]
+    n1 -- Yes --> Alert["Notify Admin"]
+    n1 -- No --> Verifier
+
+    Topic@{ shape: rounded}
+    n1@{ shape: diam}
+```
 
 This software is designed to work with two microsservices. 
+
+### Audit Writer
+The first one, `audit-writer` is responsible for receiving all the events from Kafka and process them.
+
+It is responsible for validing all input events and do all the math problems, such as hashing (SHA256) and the digital signing (ECDSA)
+
+### Audit verifier
+The second one, `audit-verifier`, is responsible for verifying the entire chain of logs.
+
+It works through a scheduled function (@Schedule), ensuring the hashes and the signing key.
+
+**In case of data violation, it will notify the system administrator.**
 
 ### Why hash chains and digital signatures ?
 Hash chains ensure **event ordering and historical integrity**, since every record is linked to the previous one through a cryptographic hash.
 
-<img width="1285" height="547" alt="image" src="https://github.com/user-attachments/assets/b5b2856a-ef11-4e4d-b220-4d9dd716e31b" />
+```mermaid
+flowchart LR
+    L1["LOG 01<br><br>HASH f9d"] --> L2@{ label: "LOG 02<br><br>current_hash: 54b<br><span style=\"color:red\">previous_hash: f9d</span>" }
+    L2 --> L3@{ label: "LOG 03<br><br><span style=\"padding-left:\">current_hash:</span> 74a<br><span style=\"color:red\">previous_hash: 54b</span>" }
+    L3 --> L4@{ label: "LOG 04<br><br><span style=\"padding-left:\">current_hash:</span> 42a<br><span style=\"color:red\">previous_hash: 74a</span>" }
+
+    L2@{ shape: rect}
+    L3@{ shape: rect}
+    L4@{ shape: rect}
+```
 
 In the example above, there are four audit log records.  
 
@@ -92,16 +126,3 @@ The digital signature (ECDSA) ensure authenticity and non-repudiation.
 **Even if an attacker recalculates the entire hash chain, they would still need the private key to forge the logs.**
 
 As long as the private key remains secure, any unauthorized modification of the audit logs will be detected.
-
-### Audit Writer
-The first one, `audit-writer` is responsible for receiving all the events from Kafka and process them.
-
-
-
-#### What is this process ?
-
-The audit writer is going to valid all input events and do all the math problems, such as Hashing (SHA256 is being used) and the digital signing (ECDSA)
-
-### Audit verifier
-The second one, `audit-verifier` is responsible for verifying all the log chain
-
