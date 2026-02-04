@@ -58,9 +58,13 @@ On Unix-based systems, you can generate it using the following commands:
 openssl ecparam -name prime256v1 -genkey -noout -out ecdsa_01.pem
 ```
 
-This file will be used in the audit-verifier project to verify log signatures.
+```bash
+openssl pkcs8 -topk8 -nocrypt -in ecdsa_01.pem -out ec-pkcs8.pem
+```
 
-**Please ensure that the private key file (ecdsa_01.pem) is stored securely.**
+**Please ensure that the private key file (ecdsa_01.pem and ec-pkcs8.pem) is stored securely.**
+
+The private key in PKCS#8 format (ec-pkcs8.pem) is only used by the audit-writer microservice.
 
 2- Generate a public key
 
