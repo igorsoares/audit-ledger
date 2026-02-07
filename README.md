@@ -1,11 +1,7 @@
-# audit-ledger
-
 <div align="center">
   <img width="400" height="400" alt="gemini-2 5-flash-image_Instead_of_black_paint_in_green-0" src="https://github.com/user-attachments/assets/adce1a0d-8cd5-40c1-aef1-47291b6032fa" />
-  <p><strong>Don't Trust. Verify !</strong></p>
+  <h1>Don't trust. Verify !</h1>
 </div>
-
-
 
 <div align="center">
 
@@ -13,9 +9,6 @@
   [Design](#design) ·
   
 </div>
-
-
-
 
 ## Description
 
@@ -79,12 +72,12 @@ This file will be used in the `audit-verifier` project to verify the signature o
 
 ```mermaid
 flowchart LR
-    User["User / External app"] -- changes password --> Topic["KAFKA log_event_topic"]
+    User["User / External app"] -- perform an action (change a password, issue a refund, modify critical system information…) --> Topic["KAFKA log_event_topic"]
     Writer["audit-writer"] -- "SHA-256 + ECDSA" --> DB[("Postgres<br>Append-only log")]
     Verifier["audit-verifier"] -- Scheduled Job --> DB
     Writer -- Consumes topic --> Topic
     Verifier -- Validate hash chain<br>and signature --> n1["Is there either a hash inconsistency or a signing key issue?"]
-    n1 -- Yes --> Alert["Notify Admin"]
+    n1 -- Yes --> Alert["Perform an action<br>(Notify the administrator...)"]
     n1 -- No --> Verifier
 
     Topic@{ shape: rounded}
