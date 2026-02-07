@@ -1,4 +1,27 @@
 services:
+  auditwriter:
+    image: auditwriter
+    restart: always
+    volumes:
+      - ./keys/private_key.pem:/auditwriter/private_key.pem:ro
+    ports:
+      - "9010:9010"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/auditdb
+      PRIVATE_KEY_PATH: /auditwriter/private_key.pem
+      BOOTSTRAP_SERVERS: broker:9092
+
+  auditverifier:
+    image: auditverifier
+    volumes:
+      - ./keys/public_key.pub:/auditverifier/public_key.pub:ro
+    restart: always
+    ports:
+      - "9011:9011"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/auditdb
+      PUBLIC_KEY_PATH: /auditverifier/public_key.pub 
+
   postgres:
     image: postgres
     restart: always
@@ -19,10 +42,10 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1

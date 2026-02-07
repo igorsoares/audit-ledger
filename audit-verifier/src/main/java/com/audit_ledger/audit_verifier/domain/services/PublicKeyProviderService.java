@@ -39,7 +39,7 @@ public class PublicKeyProviderService implements PublicKeyProvider {
         try{
             File pubKeyPath = new File(ecdsaProperties.getPublicKeyFileLocation());
             if(!pubKeyPath.exists() || !pubKeyPath.canRead() || !pubKeyPath.isFile()){
-                throw new PublicKeyLoadException("Error on reading the public key");
+                throw new PublicKeyLoadException("Error on reading the public key file ("+pubKeyPath.getAbsolutePath()+"). Does it exists ?");
             }
 
             String pem = Files.readString(Path.of(ecdsaProperties.getPublicKeyFileLocation()));
