@@ -1,0 +1,5 @@
+This key pair was generated for testing purposes only, to allow developers to build and run the microservices without generating their own private key.
+
+These keys must not be used in production.
+
+Yes — the keys are intentionally included in the repository.
