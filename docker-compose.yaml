@@ -1,6 +1,7 @@
 services:
   auditwriter:
     image: auditwriter
+    build: ./audit-writer  
     restart: always
     volumes:
       - ./keys/private_key.pem:/auditwriter/private_key.pem:ro
@@ -13,6 +14,7 @@ services:
 
   auditverifier:
     image: auditverifier
+    build: ./audit-verifier
     volumes:
       - ./keys/public_key.pub:/auditverifier/public_key.pub:ro
     restart: always
