@@ -1,0 +1,2 @@
+ecdsa:
+  private-key-file-location: ${PRIVATE_KEY_PATH:}

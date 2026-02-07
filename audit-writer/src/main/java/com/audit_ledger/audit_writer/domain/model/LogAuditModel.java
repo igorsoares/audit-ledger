@@ -63,10 +63,12 @@ public class LogAuditModel {
     public String toString() {
         return "LogAuditModel{" +
                 "eventType=" + eventType +
+                ", userId=" + userId +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", payload='" + payload + '\'' +
                 ", previousHash='" + previousHash + '\'' +
                 ", signatureAlgo='" + signatureAlgo + '\'' +
+                ", cdId=" + cdId +
                 '}';
     }
 

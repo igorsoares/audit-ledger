@@ -39,7 +39,6 @@ public class AuditWriterService implements Audit {
         try {
             log.info("Starting new audit event");
             String recvEventAsString = new ObjectMapper().findAndRegisterModules().writeValueAsString(event);
-            LocalDateTime now = LocalDateTime.now();
 
             LogAuditModel newAudit = new LogAuditModel(
                     event.getUserId(), event.getEvent(), event.getIpAddress(),

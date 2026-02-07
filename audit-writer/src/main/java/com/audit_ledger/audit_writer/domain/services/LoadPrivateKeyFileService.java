@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
-import java.util.Scanner;
 
 @Component
 public class LoadPrivateKeyFileService implements LoadPrivateKeyFile {
@@ -28,19 +30,15 @@ public class LoadPrivateKeyFileService implements LoadPrivateKeyFile {
         if(!privateFile.exists()){
             throw new PrivateKeyFileNotFoundException(this.privateKeyPath);
         }
-        StringBuilder privateKeyStrBuilder = new StringBuilder();
-        try(Scanner reader = new Scanner(privateFile)){
-            while(reader.hasNextLine()){
-                privateKeyStrBuilder.append(reader.nextLine()).append("\n");
-            }
+        try{
+            String privateKeyStr = Files.readString(Path.of(this.privateKeyPath));
 
-            String formattedPrivateKey = privateKeyStrBuilder.toString()
-                    .replace("-----BEGIN PRIVATE KEY-----","")
+            privateKeyStr = privateKeyStr.replace("-----BEGIN PRIVATE KEY-----","")
                     .replace("-----END PRIVATE KEY-----","")
                     .replace(" ","")
                     .replace("\n","");
 
-            byte[] keyBytes = Base64.getDecoder().decode(formattedPrivateKey);
+            byte[] keyBytes = Base64.getDecoder().decode(privateKeyStr);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
 
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
@@ -48,6 +46,8 @@ public class LoadPrivateKeyFileService implements LoadPrivateKeyFile {
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
             log.info("Private key has been loaded from local file");
             return privateKey;
+        } catch (InvalidKeySpecException invalidKeyException){
+            throw new KeyPairLoadException("Invalid private key");
         } catch (Exception e){
             throw new KeyPairLoadException(e.getMessage());
         }

@@ -34,7 +34,7 @@ public class VerifierService implements ApplicationRunner {
         this.panicButton = panicButton;
     }
 
-    @Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "*/30 * * * * *")
     public void verify(){
         PublicKey publicKey = publicKeyProvider.getPublicKey();
         List<LogAuditModel> allLogs = auditRepository.findAll();
