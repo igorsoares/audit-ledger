@@ -2,8 +2,8 @@ package com.audit_ledger.audit_verifier.domain.services;
 
 import com.audit_ledger.audit_verifier.application.exceptions.VerifierException;
 import com.audit_ledger.audit_verifier.application.interfaces.Hash;
-import com.audit_ledger.audit_verifier.application.interfaces.PublicKeyProvider;
 import com.audit_ledger.audit_verifier.application.interfaces.PanicButton;
+import com.audit_ledger.audit_verifier.application.interfaces.PublicKeyProvider;
 import com.audit_ledger.audit_verifier.domain.model.LogAuditModel;
 import com.audit_ledger.audit_verifier.domain.repository.AuditRepository;
 import org.slf4j.Logger;
@@ -40,21 +40,36 @@ public class VerifierService implements ApplicationRunner {
         List<LogAuditModel> allLogs = auditRepository.findAll();
         allLogs = allLogs.stream().sorted(Comparator.comparing(LogAuditModel::getCreatedAt).reversed()).toList();
 
+        String previousHash="";
+        boolean activatePanicButton=false;
         for(LogAuditModel log : allLogs){
             if(!isHashTrustable(log)){
                 logger.warn("The hash of log audit ID {} has been modified.",log.getCdId());
-                panicButton.execute();
-                return;
+                activatePanicButton=true;
             }
 
             if(!isSignatureTrustable(log, publicKey)){
                 logger.warn("The signature of log {} has been modified. Taking the necessary actions.",log.getCdId());
+                activatePanicButton=true;
+            }
+
+            if(!isChainTrustable(log,previousHash) && !previousHash.isEmpty()){
+                logger.warn("The chain of logs has been compromised. Taking the necessary actions.");
+                activatePanicButton=true;
+            }
+
+            if(activatePanicButton){
                 panicButton.execute();
                 return;
             }
 
+            previousHash = log.getPreviousHash();
         }
         logger.info("The audit has been successfully completed. No adulteration found.");
+    }
+
+    private boolean isChainTrustable(LogAuditModel log, String hash){
+        return log.getCurrentHash().equals(hash);
     }
 
     /**
