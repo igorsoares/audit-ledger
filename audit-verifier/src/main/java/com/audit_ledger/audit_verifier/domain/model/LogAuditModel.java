@@ -67,7 +67,6 @@ public class LogAuditModel {
                 ", payload='" + payload + '\'' +
                 ", previousHash='" + previousHash + '\'' +
                 ", signatureAlgo='" + signatureAlgo + '\'' +
-                ", cdId=" + cdId +
                 '}';
     }
 
